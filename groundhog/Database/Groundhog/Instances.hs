@@ -264,32 +264,42 @@ readHelper s errMessage = case s of
       (a, _):_ -> a
       _        -> error $ "readHelper: " ++ errMessage
 
-instance PersistField ByteString where
+instance PersistName ByteString where
   persistName _ = "ByteString"
+
+instance PersistField ByteString where
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive DbBlob False Nothing Nothing
+
+instance PersistName Lazy.ByteString where
+  persistName _ = "ByteString"
 
 instance PersistField Lazy.ByteString where
-  persistName _ = "ByteString"
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive DbBlob False Nothing Nothing
 
-instance PersistField String where
+instance PersistName String where
   persistName _ = "String"
+
+instance PersistField String where
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive DbString False Nothing Nothing
+
+instance PersistName T.Text where
+  persistName _ = "Text"
 
 instance PersistField T.Text where
-  persistName _ = "Text"
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive DbString False Nothing Nothing
 
-instance PersistField Int where
+instance PersistName Int where
   persistName _ = "Int"
+
+instance PersistField Int where
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ a = DbTypePrimitive (if finiteBitSize a == 32 then DbInt32 else DbInt64) False Nothing Nothing where
@@ -298,95 +308,125 @@ instance PersistField Int where
 #endif
 
 
-instance PersistField Int8 where
+instance PersistName Int8 where
   persistName _ = "Int8"
+
+instance PersistField Int8 where
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive DbInt32 False Nothing Nothing
+
+instance PersistName Int16 where
+  persistName _ = "Int16"
 
 instance PersistField Int16 where
-  persistName _ = "Int16"
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive DbInt32 False Nothing Nothing
+
+instance PersistName Int32 where
+  persistName _ = "Int32"
 
 instance PersistField Int32 where
-  persistName _ = "Int32"
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive DbInt32 False Nothing Nothing
+
+instance PersistName Int64 where
+  persistName _ = "Int64"
 
 instance PersistField Int64 where
-  persistName _ = "Int64"
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive DbInt64 False Nothing Nothing
+
+instance PersistName Word8 where
+  persistName _ = "Word8"
 
 instance PersistField Word8 where
-  persistName _ = "Word8"
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive DbInt32 False Nothing Nothing
+
+instance PersistName Word16 where
+  persistName _ = "Word16"
 
 instance PersistField Word16 where
-  persistName _ = "Word16"
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive DbInt32 False Nothing Nothing
 
-instance PersistField Word32 where
+instance PersistName Word32 where
   persistName _ = "Word32"
+
+instance PersistField Word32 where
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive DbInt64 False Nothing Nothing
+
+instance PersistName Word64 where
+  persistName _ = "Word64"
 
 instance PersistField Word64 where
-  persistName _ = "Word64"
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive DbInt64 False Nothing Nothing
 
-instance PersistField Double where
+instance PersistName Double where
   persistName _ = "Double"
+
+instance PersistField Double where
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive DbReal False Nothing Nothing
 
-instance PersistField Bool where
+instance PersistName Bool where
   persistName _ = "Bool"
+
+instance PersistField Bool where
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive DbBool False Nothing Nothing
 
-instance PersistField Day where
+instance PersistName Day where
   persistName _ = "Day"
+
+instance PersistField Day where
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive DbDay False Nothing Nothing
 
-instance PersistField TimeOfDay where
+instance PersistName TimeOfDay where
   persistName _ = "TimeOfDay"
+
+instance PersistField TimeOfDay where
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive DbTime False Nothing Nothing
 
-instance PersistField UTCTime where
+instance PersistName UTCTime where
   persistName _ = "UTCTime"
+
+instance PersistField UTCTime where
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive DbDayTime False Nothing Nothing
 
-instance PersistField ZonedTime where
+instance PersistName ZonedTime where
   persistName _ = "ZonedTime"
+
+instance PersistField ZonedTime where
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive DbDayTimeZoned False Nothing Nothing
+
+instance (PersistName a) => PersistName (Maybe a) where
+  persistName a = "Maybe" ++ delim : persistName ((undefined :: proxy (Maybe a) -> proxy a) a)
 
 -- There is a weird bug in GHC 7.4.1 which causes program to hang. See ticket 7126.
 -- instance (PersistField a, NeverNull a) => PersistField (Maybe a) where -- OK
 -- instance (SinglePersistField a, NeverNull a) => PersistField (Maybe a) where -- HANGS
 instance (PersistField a, NeverNull a) => PersistField (Maybe a) where
-  persistName a = "Maybe" ++ delim : persistName ((undefined :: Maybe a -> a) a)
   toPersistValues Nothing = return (PersistNull:)
   toPersistValues (Just a) = toPersistValues a
   fromPersistValues [] = fail "fromPersistValues Maybe: empty list"
@@ -398,21 +438,27 @@ instance (PersistField a, NeverNull a) => PersistField (Maybe a) where
       DbEmbedded (EmbeddedDef concatName [(field, DbTypePrimitive t True def ref')]) ref
     t -> error $ "dbType " ++ persistName a ++ ": expected DbTypePrimitive or DbEmbedded with one field, got " ++ show t
 
+instance (PersistName a) => PersistName [a] where
+  persistName a = "List" ++ delim : delim : persistName ((undefined :: proxy ([] a) -> proxy a) a)
+
 instance (PersistField a) => PersistField [a] where
-  persistName a = "List" ++ delim : delim : persistName ((undefined :: [] a -> a) a)
   toPersistValues l = insertList l >>= toPersistValues
   fromPersistValues [] = fail "fromPersistValues []: empty list"
   fromPersistValues (x:xs) = phantomDb >>= \p -> getList (fromPrimitivePersistValue p x) >>= \l -> return (l, xs)
   dbType db a = DbList (persistName a) $ dbType db ((undefined :: [] a -> a) a)
 
-instance PersistField () where
+instance PersistName () where
   persistName _ = "Unit" ++ [delim]
+
+instance PersistField () where
   toPersistValues _ = return id
   fromPersistValues xs = return ((), xs)
   dbType _ _ = DbEmbedded (EmbeddedDef False []) Nothing
 
+instance (PersistName a, PersistName b) => PersistName (a, b) where
+  persistName a = "Tuple2" ++ delim : delim : persistName ((undefined :: proxy (a, b) -> proxy a) a) ++ delim : persistName ((undefined :: proxy (a, b) -> proxy b) a)
+
 instance (PersistField a, PersistField b) => PersistField (a, b) where
-  persistName a = "Tuple2" ++ delim : delim : persistName ((undefined :: (a, b) -> a) a) ++ delim : persistName ((undefined :: (a, b) -> b) a)
   toPersistValues (a, b) = do
     a' <- toPersistValues a
     b' <- toPersistValues b
@@ -423,8 +469,10 @@ instance (PersistField a, PersistField b) => PersistField (a, b) where
     return ((a, b), rest1)
   dbType db a = DbEmbedded (EmbeddedDef False [("val0", dbType db ((undefined :: (a, b) -> a) a)), ("val1", dbType db ((undefined :: (a, b) -> b) a))]) Nothing
   
+instance (PersistName a, PersistName b, PersistName c) => PersistName (a, b, c) where
+  persistName a = "Tuple3" ++ delim : delim : persistName ((undefined :: proxy (a, b, c) -> proxy a) a) ++ delim : persistName ((undefined :: proxy (a, b, c) -> proxy b) a) ++ delim : persistName ((undefined :: proxy (a, b, c) -> proxy c) a)
+
 instance (PersistField a, PersistField b, PersistField c) => PersistField (a, b, c) where
-  persistName a = "Tuple3" ++ delim : delim : persistName ((undefined :: (a, b, c) -> a) a) ++ delim : persistName ((undefined :: (a, b, c) -> b) a) ++ delim : persistName ((undefined :: (a, b, c) -> c) a)
   toPersistValues (a, b, c) = do
     a' <- toPersistValues a
     b' <- toPersistValues b
@@ -437,8 +485,10 @@ instance (PersistField a, PersistField b, PersistField c) => PersistField (a, b,
     return ((a, b, c), rest2)
   dbType db a = DbEmbedded (EmbeddedDef False [("val0", dbType db ((undefined :: (a, b, c) -> a) a)), ("val1", dbType db ((undefined :: (a, b, c) -> b) a)), ("val2", dbType db ((undefined :: (a, b, c) -> c) a))]) Nothing
   
+instance (PersistName a, PersistName b, PersistName c, PersistName d) => PersistName (a, b, c, d) where
+  persistName a = "Tuple4" ++ delim : delim : persistName ((undefined :: proxy (a, b, c, d) -> proxy a) a) ++ delim : persistName ((undefined :: proxy (a, b, c, d) -> proxy b) a) ++ delim : persistName ((undefined :: proxy (a, b, c, d) -> proxy c) a) ++ delim : persistName ((undefined :: proxy (a, b, c, d) -> proxy d) a)
+
 instance (PersistField a, PersistField b, PersistField c, PersistField d) => PersistField (a, b, c, d) where
-  persistName a = "Tuple4" ++ delim : delim : persistName ((undefined :: (a, b, c, d) -> a) a) ++ delim : persistName ((undefined :: (a, b, c, d) -> b) a) ++ delim : persistName ((undefined :: (a, b, c, d) -> c) a) ++ delim : persistName ((undefined :: (a, b, c, d) -> d) a)
   toPersistValues (a, b, c, d) = do
     a' <- toPersistValues a
     b' <- toPersistValues b
@@ -453,8 +503,10 @@ instance (PersistField a, PersistField b, PersistField c, PersistField d) => Per
     return ((a, b, c, d), rest3)
   dbType db a = DbEmbedded (EmbeddedDef False [("val0", dbType db ((undefined :: (a, b, c, d) -> a) a)), ("val1", dbType db ((undefined :: (a, b, c, d) -> b) a)), ("val2", dbType db ((undefined :: (a, b, c, d) -> c) a)), ("val3", dbType db ((undefined :: (a, b, c, d) -> d) a))]) Nothing
   
+instance (PersistName a, PersistName b, PersistName c, PersistName d, PersistName e) => PersistName (a, b, c, d, e) where
+  persistName a = "Tuple5" ++ delim : delim : persistName ((undefined :: proxy (a, b, c, d, e) -> proxy a) a) ++ delim : persistName ((undefined :: proxy (a, b, c, d, e) -> proxy b) a) ++ delim : persistName ((undefined :: proxy (a, b, c, d, e) -> proxy c) a) ++ delim : persistName ((undefined :: proxy (a, b, c, d, e) -> proxy d) a) ++ delim : persistName ((undefined :: proxy (a, b, c, d, e) -> proxy e) a)
+
 instance (PersistField a, PersistField b, PersistField c, PersistField d, PersistField e) => PersistField (a, b, c, d, e) where
-  persistName a = "Tuple5" ++ delim : delim : persistName ((undefined :: (a, b, c, d, e) -> a) a) ++ delim : persistName ((undefined :: (a, b, c, d, e) -> b) a) ++ delim : persistName ((undefined :: (a, b, c, d, e) -> c) a) ++ delim : persistName ((undefined :: (a, b, c, d, e) -> d) a) ++ delim : persistName ((undefined :: (a, b, c, d, e) -> e) a)
   toPersistValues (a, b, c, d, e) = do
     a' <- toPersistValues a
     b' <- toPersistValues b
@@ -471,8 +523,10 @@ instance (PersistField a, PersistField b, PersistField c, PersistField d, Persis
     return ((a, b, c, d, e), rest4)
   dbType db a = DbEmbedded (EmbeddedDef False [("val0", dbType db ((undefined :: (a, b, c, d, e) -> a) a)), ("val1", dbType db ((undefined :: (a, b, c, d, e) -> b) a)), ("val2", dbType db ((undefined :: (a, b, c, d, e) -> c) a)), ("val3", dbType db ((undefined :: (a, b, c, d, e) -> d) a)), ("val4", dbType db ((undefined :: (a, b, c, d, e) -> e) a))]) Nothing
 
+instance (DbDescriptor db, PersistEntity v, PersistName v) => PersistName (KeyForBackend db v) where
+  persistName a = "KeyForBackend" ++ delim : persistName ((undefined :: proxy (KeyForBackend db v) -> proxy v) a)
+
 instance (DbDescriptor db, PersistEntity v, PersistField v) => PersistField (KeyForBackend db v) where
-  persistName a = "KeyForBackend" ++ delim : persistName ((undefined :: KeyForBackend db v -> v) a)
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType db a = dbType db ((undefined :: KeyForBackend db v -> DefaultKey v) a)

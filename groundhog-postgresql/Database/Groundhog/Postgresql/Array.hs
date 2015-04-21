@@ -45,8 +45,10 @@ import Prelude hiding (all, any)
 -- | Represents PostgreSQL arrays
 newtype Array a = Array [a] deriving (Eq, Show)
 
+instance PersistName a => PersistName (Array a) where
+  persistName a = "Array" ++ delim : persistName ((undefined :: proxy (Array a) -> proxy a) a)
+
 instance (ArrayElem a, PrimitivePersistField a) => PersistField (Array a) where
-  persistName a = "Array" ++ delim : persistName ((undefined :: Array a -> a) a)
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType p a = DbTypePrimitive (arrayType p a) False Nothing Nothing

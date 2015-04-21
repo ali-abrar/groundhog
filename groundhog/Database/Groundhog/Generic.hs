@@ -142,8 +142,8 @@ mergeMigrations ms = case partitionEithers ms of
   ([], statements) -> Right $ concat statements
   (errors, _)      -> Left  $ concat errors
 
-failMessage :: PersistField a => a -> [PersistValue] -> String
-failMessage a = failMessageNamed (persistName a)
+failMessage :: forall a. PersistField a => a -> [PersistValue] -> String
+failMessage a = failMessageNamed (persistName (undefined :: proxy a))
 
 failMessageNamed :: String -> [PersistValue] -> String
 failMessageNamed name xs = "Invalid list for " ++ name ++ ": " ++ show xs

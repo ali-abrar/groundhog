@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, TypeFamilies, ExistentialQuantification, MultiParamTypeClasses, FunctionalDependencies, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, EmptyDataDecls, ConstraintKinds, CPP #-}
+{-# LANGUAGE GADTs, TypeFamilies, ExistentialQuantification, MultiParamTypeClasses, FunctionalDependencies, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, EmptyDataDecls, ConstraintKinds, CPP, PolyKinds #-}
 {-# LANGUAGE UndecidableInstances #-} -- Required for Projection'
 -- | This module defines the functions and datatypes used throughout the framework.
 -- Most of them are for the internal use
@@ -7,6 +7,7 @@ module Database.Groundhog.Core
   -- * Main types
     PersistEntity(..)
   , PersistValue(..)
+  , PersistName(..)
   , PersistField(..)
   , SinglePersistField(..)
   , PurePersistField(..)
@@ -560,10 +561,12 @@ newtype Expr db r a = Expr (UntypedExpr db r)
 instance Show (Expr db r a) where show _ = "Expr"
 instance Eq (Expr db r a) where (==) = error "(==): this instance Eq (Expr db r a) is made only for Num superclass constraint"
 
--- | Represents everything which can be put into a database. This data can be stored in multiple columns and tables. To get value of those columns we might need to access another table. That is why the result type is monadic.
-class PersistField a where
+class PersistName (a :: k) where
   -- | Return name of the type. If it is polymorphic, the names of parameter types are separated with 'Database.Groundhog.Generic.delim' symbol
-  persistName :: a -> String
+  persistName :: proxy a -> String
+
+-- | Represents everything which can be put into a database. This data can be stored in multiple columns and tables. To get value of those columns we might need to access another table. That is why the result type is monadic.
+class PersistName a => PersistField a where
   -- | Convert a value into something which can be stored in a database column.
   -- Note that for complex datatypes it may insert them to return identifier
   toPersistValues :: PersistBackend m => a -> m ([PersistValue] -> [PersistValue])

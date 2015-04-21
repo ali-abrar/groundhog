@@ -236,7 +236,7 @@ insertIntoConstructorTable withRet withId tName c vals = RenderS query vals' whe
 
 insertList' :: forall m a.(MonadBaseControl IO m, MonadIO m, MonadLogger m, PersistField a) => [a] -> DbPersist Postgresql m Int64
 insertList' (l :: [a]) = do
-  let mainName = "List" <> delim' <> delim' <> fromString (persistName (undefined :: a))
+  let mainName = "List" <> delim' <> delim' <> fromString (persistName (undefined :: proxy a))
   k <- queryRaw' ("INSERT INTO " <> escapeS mainName <> " DEFAULT VALUES RETURNING(id)") [] getKey
   let valuesName = mainName <> delim' <> "values"
   let fields = [("ord", dbType proxy (0 :: Int)), ("value", dbType proxy (undefined :: a))]
@@ -252,7 +252,7 @@ insertList' (l :: [a]) = do
   
 getList' :: forall m a.(MonadBaseControl IO m, MonadIO m, MonadLogger m, PersistField a) => Int64 -> DbPersist Postgresql m [a]
 getList' k = do
-  let mainName = "List" <> delim' <> delim' <> fromString (persistName (undefined :: a))
+  let mainName = "List" <> delim' <> delim' <> fromString (persistName (undefined :: proxy a))
   let valuesName = mainName <> delim' <> "values"
   let value = ("value", dbType proxy (undefined :: a))
   let query = "SELECT " <> renderFields escapeS [value] <> " FROM " <> escapeS valuesName <> " WHERE id=? ORDER BY ord"

@@ -76,8 +76,10 @@ instance PrimitivePersistField Point where
   toPrimitivePersistValue _ (Point x y) = PersistString $ show (x, y)
   fromPrimitivePersistValue _ = parseHelper point
 
-instance PersistField Point where
+instance PersistName Point where
   persistName _ = "Point"
+
+instance PersistField Point where
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive (DbOther $ OtherTypeDef $ [Left "point"]) False Nothing Nothing
@@ -86,8 +88,10 @@ instance PrimitivePersistField Line where
   toPrimitivePersistValue _ (Line (Point x1 y1) (Point x2 y2)) = PersistString $ show ((x1, y1), (x2, y2))
   fromPrimitivePersistValue _ = error "fromPrimitivePersistValue Line is not supported yet"
 
-instance PersistField Line where
+instance PersistName Line where
   persistName _ = "Line"
+
+instance PersistField Line where
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive (DbOther $ OtherTypeDef $ [Left "line"]) False Nothing Nothing
@@ -96,8 +100,10 @@ instance PrimitivePersistField Lseg where
   toPrimitivePersistValue _ (Lseg (Point x1 y1) (Point x2 y2)) = PersistString $ show ((x1, y1), (x2, y2))
   fromPrimitivePersistValue _ = parseHelper $ pair Lseg '[' ']' point
 
-instance PersistField Lseg where
+instance PersistName Lseg where
   persistName _ = "Lseg"
+
+instance PersistField Lseg where
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive (DbOther $ OtherTypeDef $ [Left "lseg"]) False Nothing Nothing
@@ -106,8 +112,10 @@ instance PrimitivePersistField Box where
   toPrimitivePersistValue _ (Box (Point x1 y1) (Point x2 y2)) = PersistString $ show ((x1, y1), (x2, y2))
   fromPrimitivePersistValue _ = parseHelper $ Box <$> (point <* char ',') <*> point
 
-instance PersistField Box where
+instance PersistName Box where
   persistName _ = "Box"
+
+instance PersistField Box where
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive (DbOther $ OtherTypeDef $ [Left "box"]) False Nothing Nothing
@@ -129,8 +137,10 @@ instance PrimitivePersistField Path where
   fromPrimitivePersistValue _ = parseHelper $ path' ClosedPath '(' ')' <|> path' OpenPath '[' ']' where
     path' f open close = f <$> (char open *> points <* char close)
 
-instance PersistField Path where
+instance PersistName Path where
   persistName _ = "Path"
+
+instance PersistField Path where
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive (DbOther $ OtherTypeDef $ [Left "path"]) False Nothing Nothing
@@ -139,8 +149,10 @@ instance PrimitivePersistField Polygon where
   toPrimitivePersistValue _ (Polygon ps) = PersistString $ showPath '(' ')' ps ""
   fromPrimitivePersistValue _ = parseHelper $ Polygon <$> (char '(' *> points <* char ')')
 
-instance PersistField Polygon where
+instance PersistName Polygon where
   persistName _ = "Polygon"
+
+instance PersistField Polygon where
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive (DbOther $ OtherTypeDef $ [Left "polygon"]) False Nothing Nothing
@@ -149,8 +161,10 @@ instance PrimitivePersistField Circle where
   toPrimitivePersistValue _ (Circle (Point x1 y1) r) = PersistString $ show ((x1, y1), r)
   fromPrimitivePersistValue _ = parseHelper $ Circle <$> (char '<' *> point) <* char ',' <*> double <* char '>'
 
-instance PersistField Circle where
+instance PersistName Circle where
   persistName _ = "Circle"
+
+instance PersistField Circle where
   toPersistValues = primToPersistValue
   fromPersistValues = primFromPersistValue
   dbType _ _ = DbTypePrimitive (DbOther $ OtherTypeDef $ [Left "circle"]) False Nothing Nothing
