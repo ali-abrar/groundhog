@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, TypeFamilies, ExistentialQuantification, MultiParamTypeClasses, FunctionalDependencies, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, EmptyDataDecls, ConstraintKinds #-}
+{-# LANGUAGE GADTs, TypeFamilies, ExistentialQuantification, MultiParamTypeClasses, FunctionalDependencies, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, EmptyDataDecls, ConstraintKinds, DeriveDataTypeable, StandaloneDeriving #-}
 {-# LANGUAGE UndecidableInstances #-} -- Required for Projection'
 -- | This module defines the functions and datatypes used throughout the framework.
 -- Most of them are for the internal use
@@ -100,6 +100,7 @@ import Data.Int (Int64)
 import Data.Map (Map)
 import Data.Time (Day, TimeOfDay, UTCTime)
 import Data.Time.LocalTime (ZonedTime, zonedTimeToUTC, zonedTimeToLocalTime, zonedTimeZone)
+import Data.Typeable
 import GHC.Exts (Constraint)
 
 -- | Only instances of this class can be persisted in a database
@@ -128,10 +129,12 @@ class (PurePersistField (AutoKey v), PurePersistField (DefaultKey v)) => Persist
   -- We could avoid this function if class FieldLike allowed FieldLike Fields Data or FieldLike (Fields Data). However that would require additional extensions in user-space code
   entityFieldChain :: DbDescriptor db => proxy db -> Field v c a -> FieldChain
 
+deriving instance Typeable2 Key
+
 -- | A holder for Unique constraints
 data Unique (u :: (* -> *) -> *)
 -- | Key marked with this type can have value for any backend
-data BackendSpecific
+data BackendSpecific deriving Typeable
 -- | A phantom datatype to make instance head different @c (ConstructorMarker v)@
 data ConstructorMarker v a
 -- | A phantom datatype to make instance head different @u (UniqueMarker v)@
