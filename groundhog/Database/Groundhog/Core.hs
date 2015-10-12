@@ -100,7 +100,7 @@ import Data.Int (Int64)
 import Data.Map (Map)
 import Data.Time (Day, TimeOfDay, UTCTime)
 import Data.Time.LocalTime (ZonedTime, zonedTimeToUTC, zonedTimeToLocalTime, zonedTimeZone)
-import Data.Typeable
+import Data.Typeable hiding (Proxy)
 import GHC.Exts (Constraint)
 
 -- | Only instances of this class can be persisted in a database
